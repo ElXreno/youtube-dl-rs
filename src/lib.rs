@@ -113,6 +113,7 @@ pub struct YoutubeDl {
     process_timeout: Option<Duration>,
     referer: Option<String>,
     socket_timeout: Option<String>,
+    output_pattern: Option<String>,
     url: String,
     user_agent: Option<String>,
     youtube_dl_path: Option<PathBuf>,
@@ -130,6 +131,7 @@ impl YoutubeDl {
             process_timeout: None,
             referer: None,
             socket_timeout: None,
+            output_pattern: None,
             url: url.into(),
             user_agent: None,
             youtube_dl_path: None,
@@ -197,6 +199,12 @@ impl YoutubeDl {
         self
     }
 
+    /// Set the `-o` command line option
+    pub fn output_pattern<S: Into<String>>(&mut self, output_pattern: S) -> &mut Self {
+        self.output_pattern = Some(output_pattern.into());
+        self
+    }
+
     fn path(&self) -> &Path {
         match &self.youtube_dl_path {
             Some(path) => path,
@@ -239,6 +247,11 @@ impl YoutubeDl {
         if let Some(referer) = &self.referer {
             args.push("--referer");
             args.push(referer);
+        }
+
+        if let Some(output_pattern) = &self.output_pattern {
+            args.push("-o");
+            args.push(output_pattern);
         }
 
         if !self.download {
