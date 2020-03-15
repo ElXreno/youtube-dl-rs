@@ -106,6 +106,7 @@ impl StdError for Error {
 #[derive(Clone, Debug)]
 pub struct YoutubeDl {
     all_formats: bool,
+    add_metadata: bool,
     audio_format: Option<String>,
     auth: Option<(String, String)>,
     download: bool,
@@ -125,6 +126,7 @@ impl YoutubeDl {
     pub fn new<S: Into<String>>(url: S) -> Self {
         Self {
             all_formats: false,
+            add_metadata: false,
             audio_format: None,
             auth: None,
             download: false,
@@ -149,6 +151,12 @@ impl YoutubeDl {
     /// Set the `-F` command line option.
     pub fn format<S: Into<String>>(&mut self, format: S) -> &mut Self {
         self.format = Some(format.into());
+        self
+    }
+
+    /// Add the `--add-metadata` command line flag.
+    pub fn add_metadata(&mut self, add_metadata: bool) -> &mut Self {
+        self.add_metadata = add_metadata;
         self
     }
 
@@ -225,6 +233,10 @@ impl YoutubeDl {
         if let Some(format) = &self.format {
             args.push("-f");
             args.push(format);
+        }
+
+        if self.add_metadata {
+            args.push("--add-metadata");
         }
 
         if let Some(audio_format) = &self.audio_format {
