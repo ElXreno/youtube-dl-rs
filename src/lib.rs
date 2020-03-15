@@ -106,6 +106,7 @@ impl StdError for Error {
 #[derive(Clone, Debug)]
 pub struct YoutubeDl {
     all_formats: bool,
+    audio_format: Option<String>,
     auth: Option<(String, String)>,
     download: bool,
     flat_playlist: bool,
@@ -124,6 +125,7 @@ impl YoutubeDl {
     pub fn new<S: Into<String>>(url: S) -> Self {
         Self {
             all_formats: false,
+            audio_format: None,
             auth: None,
             download: false,
             flat_playlist: false,
@@ -147,6 +149,12 @@ impl YoutubeDl {
     /// Set the `-F` command line option.
     pub fn format<S: Into<String>>(&mut self, format: S) -> &mut Self {
         self.format = Some(format.into());
+        self
+    }
+
+    /// Set the `--audio-format` command line option.
+    pub fn audio_format<S: Into<String>>(&mut self, audio_format: S) -> &mut Self {
+        self.audio_format = Some(audio_format.into());
         self
     }
 
@@ -217,6 +225,11 @@ impl YoutubeDl {
         if let Some(format) = &self.format {
             args.push("-f");
             args.push(format);
+        }
+
+        if let Some(audio_format) = &self.audio_format {
+            args.push("--audio-format");
+            args.push(audio_format);
         }
 
         if self.flat_playlist {
