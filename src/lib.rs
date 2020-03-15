@@ -110,6 +110,7 @@ pub struct YoutubeDl {
     audio_format: Option<String>,
     auth: Option<(String, String)>,
     download: bool,
+    extract_audio: bool,
     flat_playlist: bool,
     format: Option<String>,
     process_timeout: Option<Duration>,
@@ -130,6 +131,7 @@ impl YoutubeDl {
             audio_format: None,
             auth: None,
             download: false,
+            extract_audio: false,
             flat_playlist: false,
             format: None,
             process_timeout: None,
@@ -154,7 +156,7 @@ impl YoutubeDl {
         self
     }
 
-    /// Add the `--add-metadata` command line flag.
+    /// Set the `--add-metadata` command line flag.
     pub fn add_metadata(&mut self, add_metadata: bool) -> &mut Self {
         self.add_metadata = add_metadata;
         self
@@ -163,6 +165,12 @@ impl YoutubeDl {
     /// Set the `--audio-format` command line option.
     pub fn audio_format<S: Into<String>>(&mut self, audio_format: S) -> &mut Self {
         self.audio_format = Some(audio_format.into());
+        self
+    }
+
+    /// Set the `--extract-audio` command line flag.
+    pub fn extract_audio(&mut self, extract_audio: bool) -> &mut Self {
+        self.extract_audio = extract_audio;
         self
     }
 
@@ -242,6 +250,10 @@ impl YoutubeDl {
         if let Some(audio_format) = &self.audio_format {
             args.push("--audio-format");
             args.push(audio_format);
+        }
+
+        if self.extract_audio {
+            args.push("--extract-audio");
         }
 
         if self.flat_playlist {
