@@ -30,6 +30,9 @@ pub enum YoutubeDlOutput {
     Playlist(Box<Playlist>),
     /// Single video result
     SingleVideo(Box<SingleVideo>),
+    /// No result when download
+    /// TODO: Return download result
+    None,
 }
 
 impl YoutubeDlOutput {
@@ -104,6 +107,7 @@ impl StdError for Error {
 pub struct YoutubeDl {
     all_formats: bool,
     auth: Option<(String, String)>,
+    download: bool,
     flat_playlist: bool,
     format: Option<String>,
     process_timeout: Option<Duration>,
@@ -120,6 +124,7 @@ impl YoutubeDl {
         Self {
             all_formats: false,
             auth: None,
+            download: false,
             flat_playlist: false,
             format: None,
             process_timeout: None,
@@ -186,6 +191,12 @@ impl YoutubeDl {
         self
     }
 
+    /// Remove the `-J` command line flag.
+    pub fn download(&mut self, download: bool) -> &mut Self {
+        self.download = download;
+        self
+    }
+
     fn path(&self) -> &Path {
         match &self.youtube_dl_path {
             Some(path) => path,
@@ -229,7 +240,11 @@ impl YoutubeDl {
             args.push("--referer");
             args.push(referer);
         }
-        args.push("-J");
+
+        if !self.download {
+            args.push("-J");
+        }
+
         args.push(&self.url);
         log::debug!("youtube-dl arguments: {:?}", args);
 
@@ -263,6 +278,10 @@ impl YoutubeDl {
         };
 
         if exit_code.success() {
+            if self.download {
+                return Ok(YoutubeDlOutput::None)
+            }
+
             let stdout = child.stdout.unwrap();
             let value: Value = serde_json::from_reader(stdout)?;
 
