@@ -102,32 +102,32 @@ impl StdError for Error {
 /// A builder to create a `youtube-dl` command to execute.
 #[derive(Clone, Debug)]
 pub struct YoutubeDl {
-    youtube_dl_path: Option<PathBuf>,
-    format: Option<String>,
-    flat_playlist: bool,
-    socket_timeout: Option<String>,
     all_formats: bool,
     auth: Option<(String, String)>,
-    user_agent: Option<String>,
-    referer: Option<String>,
-    url: String,
+    flat_playlist: bool,
+    format: Option<String>,
     process_timeout: Option<Duration>,
+    referer: Option<String>,
+    socket_timeout: Option<String>,
+    url: String,
+    user_agent: Option<String>,
+    youtube_dl_path: Option<PathBuf>,
 }
 
 impl YoutubeDl {
     /// Create a new builder.
     pub fn new<S: Into<String>>(url: S) -> Self {
         Self {
-            url: url.into(),
-            youtube_dl_path: None,
-            format: None,
-            flat_playlist: false,
-            socket_timeout: None,
             all_formats: false,
             auth: None,
-            user_agent: None,
-            referer: None,
+            flat_playlist: false,
+            format: None,
             process_timeout: None,
+            referer: None,
+            socket_timeout: None,
+            url: url.into(),
+            user_agent: None,
+            youtube_dl_path: None,
         }
     }
 
